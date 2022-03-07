@@ -1,0 +1,355 @@
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet tile maps</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+
+
+</head>
+<body>
+
+
+<script>
+// Function to get data from a json dictionnary
+var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "json";
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(status, xhr.response);
+      }
+    };
+    xhr.send();
+};
+
+function getBaseMapName(data){
+  name=data["name"]
+  if (name.includes(".")){
+   var basemap=name.split(".")[0];
+  }
+  else{
+    var basemap=name
+  }
+  return basemap
+}
+
+function initTableMetadata(data){
+  nbOfRows=Object.keys(data).length
+	key=Object.keys(data)
+  val=Object.values(data)
+  const body = document.body,
+  tbl = document.createElement("table");
+  tbl.className = "table-container";
+  tbl.style.width = "83%";
+  tbl.style.border = "0px solid";
+
+    
+  for (let i = 0; i < nbOfRows; i++) {
+    const tr = tbl.insertRow();
+
+    for (let j = 0; j < 2; j++) {
+      if (i === nbOfRows-2 && j === 2) {
+        break;
+      } 
+      else {
+        const td1 = tr.insertCell();
+        if(j==0){
+        td1.appendChild(document.createTextNode(key[i]));
+        td1.style.border = "0px solid black";
+        td1.style.fontFamily="Arial";
+        
+        }
+    
+        else{
+      
+        td1.appendChild(document.createTextNode(val[i]));
+        td1.style.border = "0px solid black";
+        td1.style.fontFamily="monospace";
+
+       }
+      
+      }
+    }
+   }
+  
+body.appendChild(tbl);
+}
+
+
+function initMapTitle(data){
+  var TitleDiv = document.createElement("div");
+  TitleDiv.className = "title-container";
+	var TitleContent = document.createTextNode(data["name"]);
+	TitleDiv.appendChild(TitleContent);
+	document.body.append(TitleDiv);  
+}
+
+
+function initMap(data,accessData){ 
+  basemap=getBaseMapName(data);
+  var MapContainer = document.createElement("div"); 
+  MapContainer.className = "map-container";
+	MapContainer.style.height="20%";                 
+	MapContainer.style.width="80%";
+	document.body.append(MapContainer);   
+  
+	  try{
+			//var marker = L.marker([48.81646, 2.46912]).addTo(parisMap);
+			//var marker = L.marker([48.81646, 2.46912], { opacity: 0.01 });
+			//marker.bindTooltip("Office is here", {permanent: true, className: "my-label", offset: [0, 0] });
+			//marker.addTo(parisMap);
+		//console.log("url is :",data["url"])
+    var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([48.81646, 2.46912], 11); 
+      if (accessData[basemap]===undefined){
+		    console.log("There is no access code needed for",basemap);
+        L.tileLayer(data["url"],data).addTo(parisMap);
+      }
+	    else{
+        dict=accessData[basemap];
+        var accessString=dict["accessString"];
+        var keyInput = document.createElement("input");
+        document.body.append(keyInput);  
+        keyInput.type="text";
+        keyInput.style.fontFamily="Arial";
+        keyInput.style.fontSize="20px";
+        keyInput.style.color="rgb(78, 116, 90)";
+        keyInput.class="key-container";
+        keyInput.value="Enter your APIkey please";
+        var validationButton = document.createElement("button");
+        document.body.append(validationButton); 
+        validationButton.class="button-container";
+        validationButton.style.fontFamily="Arial";
+        validationButton.style.fontWeight="bold";
+        validationButton.style.fontSize="20px";
+        validationButton.style.color="white";
+        validationButton.style.backgroundColor="rgb(78, 116, 90)";
+        validationButton.innerHTML = "validate";
+        validationButton.onclick=get_Code;
+        function get_Code(){
+          data[accessString]=keyInput.value;
+          console.log("the apikey is:",data[accessString]);
+          L.tileLayer(data["url"],data).addTo(parisMap);
+        }
+        
+      }
+    }	
+		catch{
+	
+    }
+   
+}
+var accessData={
+"Thunderforest": {
+    "accessString":"apikey",
+    "name": "Thunderforest"
+
+},
+"OpenWeatherMap": {
+    "accessString":"apiKey",
+    "name": "OpenWeatherMap"
+},
+
+     "HERE": {
+    "accessString": "apiKey",
+    "name": "HERE"
+} ,  
+
+        
+"HEREv3":{
+    "accessString": "apiKey",
+    "name": "HEREv3"
+   
+}      ,
+"MapTiler": {
+"accessString": "key",
+"name": "MapTiler"
+}  
+,
+"MapBox": {
+"accessString": "accessToken",
+"name": "MapBox"
+},
+"Jawg":{
+"accessString":"accessToken",
+"name": "Jawg"
+},
+"TomTom":{
+"accessString": "apikey",
+"name": "TomTom"
+}
+}
+
+
+var data1 ={
+  "OpenStreetMap": {
+        "Mapnik": {
+            "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            "max_zoom": 19,
+            "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "attribution": "(C) OpenStreetMap contributors",
+            "name": "OpenStreetMap.Mapnik"
+        },
+        "DE": {
+            "url": "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png",
+            "max_zoom": 18,
+            "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "attribution": "(C) OpenStreetMap contributors",
+            "name": "OpenStreetMap.DE"
+        },
+        "CH": {
+            "url": "https://tile.osm.ch/switzerland/{z}/{x}/{y}.png",
+            "max_zoom": 18,
+            "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "attribution": "(C) OpenStreetMap contributors",
+            "bounds": [
+                [
+                    45,
+                    5
+                ],
+                [
+                    48,
+                    11
+                ]
+            ],
+            "name": "OpenStreetMap.CH"
+        }
+      }, 
+"MapTiler": {
+        "Streets": {
+            "url": "https://api.maptiler.com/maps/{variant}/{z}/{x}/{y}{r}.{ext}?key={key}",
+            "html_attribution": "<a href=\"https://www.maptiler.com/copyright/\" target=\"_blank\">&copy; MapTiler</a> <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">&copy; OpenStreetMap contributors</a>",
+            "attribution": "(C) MapTiler (C) OpenStreetMap contributors",
+            "variant": "streets",
+            "ext": "png",
+            "key": "<insert your MapTiler Cloud API key here>",
+            "tileSize": 512,
+            "zoomOffset": -1,
+            "min_zoom": 0,
+            "max_zoom": 21,
+            "name": "MapTiler.Streets"
+        }
+      },
+  "Jawg": {
+        "Streets": {
+            "url": "https://{s}.tile.jawg.io/{variant}/{z}/{x}/{y}{r}.png?access-token={accessToken}",
+            "html_attribution": "<a href=\"http://jawg.io\" title=\"Tiles Courtesy of Jawg Maps\" target=\"_blank\">&copy; <b>Jawg</b>Maps</a> &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "attribution": "(C) **Jawg** Maps (C) OpenStreetMap contributors",
+            "min_zoom": 0,
+            "max_zoom": 22,
+            "subdomains": "abcd",
+            "variant": "jawg-streets",
+            "accessToken": "<insert your access token here>",
+            "name": "Jawg.Streets"
+        }
+      }
+    }
+
+    var data2 ={
+  "Jawg": {
+        "Streets": {
+            "url": "https://{s}.tile.jawg.io/{variant}/{z}/{x}/{y}{r}.png?access-token={accessToken}",
+            "html_attribution": "<a href=\"http://jawg.io\" title=\"Tiles Courtesy of Jawg Maps\" target=\"_blank\">&copy; <b>Jawg</b>Maps</a> &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "attribution": "(C) **Jawg** Maps (C) OpenStreetMap contributors",
+            "min_zoom": 0,
+            "max_zoom": 22,
+            "subdomains": "abcd",
+            "variant": "jawg-streets",
+            "accessToken": "<insert your access token here>",
+            "name": "Jawg.Streets"
+        }
+      },
+      "TomTom": {
+        "Basic": {
+            "url": "https://{s}.api.tomtom.com/map/1/tile/{variant}/{style}/{z}/{x}/{y}.{ext}?key={apikey}",
+            "variant": "basic",
+            "max_zoom": 22,
+            "html_attribution": "<a href=\"https://tomtom.com\" target=\"_blank\">&copy;  1992 - 2022 TomTom.</a> ",
+            "attribution": "(C) 1992 - 2022 TomTom.",
+            "subdomains": "abcd",
+            "style": "main",
+            "ext": "png",
+            "apikey": "<insert your API key here>",
+            "name": "TomTom.Basic"
+        }
+    },
+    "Thunderforest": {
+        "OpenCycleMap": {
+            "url": "https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}",
+            "html_attribution": "&copy; <a href=\"http://www.thunderforest.com/\">Thunderforest</a>, &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "attribution": "(C) Thunderforest, (C) OpenStreetMap contributors",
+            "variant": "cycle",
+            "apikey": "<insert your api key here>",
+            "max_zoom": 22,
+            "name": "Thunderforest.OpenCycleMap"
+        }
+      }
+  }
+var CreateMapDataList=function(data){
+  var outDataList=[]    
+  //getJSON("https://raw.githubusercontent.com/geopandas/xyzservices/main/provider_sources/leaflet-providers-parsed.json", (err, data) => {
+  for([keyData, valData] of Object.entries(data)) { 
+	  if (valData["url"]===undefined){// check if url is a key of the json object, if not go one level deeper and define the val as the new object
+		  newdata=valData;
+
+		  for([keyNewdata, valNewdata] of Object.entries(newdata)){
+			  if (valNewdata["bounds"]===undefined){
+			  }
+			  else{
+		  	valNewdata["bounds"]=undefined;		
+			  }			
+		  outDataList.push(valNewdata);	
+		  }
+	  }
+		
+	  else{
+  		  outDataList.push(valData);
+	  }
+  }
+//})
+  return outDataList
+}
+
+dataList=CreateMapDataList(data=data2)
+const section1 = document.createElement("section");
+section1.className = "top-page";
+document.body.append(section1); 
+const header=document.createElement("header")
+header.className = "header";
+document.body.append(header); 
+const div1=document.createElement("div")
+div1.className = "landing-page";
+document.body.append(div1); 
+const h1 = document.createElement("h1");
+h1.className = "big-title";
+const textNode1 = document.createTextNode("Welcome to Leaflet's catalog");
+h1.appendChild(textNode1);
+document.body.append(h1);
+
+for (let ii = 0; ii < dataList.length; ii++){
+  data=dataList[ii];
+  const div2 = document.createElement("div");
+  div2.className = "thumbnail";
+  document.body.append(div2); 
+  initMapTitle(data);
+  initTableMetadata(data);
+  initMap(data,accessData);
+}
+
+</script>
+</body>
+</html>
