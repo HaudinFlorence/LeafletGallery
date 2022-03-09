@@ -21,7 +21,7 @@
 
 
 <script>
-// Function to get data from a json dictionnary
+// Function to get data from a .json file
 var getJSON = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
@@ -48,48 +48,99 @@ function getBaseMapName(data){
   return basemap
 }
 
-function initTableMetadata(data){
-  nbOfRows=Object.keys(data).length
-	key=Object.keys(data)
-  val=Object.values(data)
-  const body = document.body,
-  tbl = document.createElement("table");
-  tbl.className = "table-container";
-  tbl.style.width = "83%";
-  tbl.style.border = "0px solid";
+function initMap(data,accessData){
+  basemap=getBaseMapName(data);
+  var MapContainer = document.createElement("div"); 
+  MapContainer.style.width="80%"
+  MapContainer.style.height="30%"
+  MapContainer.className = "map-container";
+	document.body.append(MapContainer);   
+  key=Object.keys(data);
+  val=Object.values(data);
+  nbOfRows=Object.keys(data).length;
+  const body = document.body;
 
-    
-  for (let i = 0; i < nbOfRows; i++) {
-    const tr = tbl.insertRow();
+ try{
+    var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([48.81646, 2.46912], 11); 
+    	//var marker = L.marker([48.81646, 2.46912]).addTo(parisMap);;
+      //---------------------------------------------------------------------------------------------------------------------
+      if (accessData[basemap]===undefined){ // No apikey or access token needed
+        L.tileLayer(data["url"],data).addTo(parisMap);
+        tbl1 = document.createElement("table");
+        tbl1.className = "table-container";
 
-    for (let j = 0; j < 2; j++) {
-      if (i === nbOfRows-2 && j === 2) {
-        break;
-      } 
-      else {
-        const td1 = tr.insertCell();
-        if(j==0){
-        td1.appendChild(document.createTextNode(key[i]));
-        td1.style.border = "0px solid black";
-        td1.style.fontFamily="Arial";
-        
+        for (let i = 0; i < nbOfRows; i++) {
+          const tr1 = tbl1.insertRow();
+          for (let j = 0; j < 2; j++) {
+            if (i === nbOfRows-2 && j === 2) {
+              break;
+            } 
+            else {
+             const td1 = tr1.insertCell();
+             if(j==0){// First column of the table : the one with the keys
+               td1.appendChild(document.createTextNode(key[i]));
+               td1.className="key-cell";
+              }
+            else{// Second column of the table : the one with the values of the metadata
+              td1.className="val-cell"
+              td1.appendChild(document.createTextNode(val[i]));
+            }
+          }
         }
-    
-        else{
-      
-        td1.appendChild(document.createTextNode(val[i]));
-        td1.style.border = "0px solid black";
-        td1.style.fontFamily="monospace";
-
-       }
-      
+      }
+      body.appendChild(tbl1);
+    }
+    //---------------------------------------------------------------------------------------------------------------------
+	    else{ // You need to give an apikey or an access token to display the map
+        dict=accessData[basemap];
+        var accessString=dict["accessString"]; 
+        tbl3 = document.createElement("table");
+        tbl3.className = "table-container";
+        for (let i = 0; i < nbOfRows; i++) {
+            const tr3 = tbl3.insertRow();
+            for (let j = 0; j < 2; j++) {
+              if (i === nbOfRows-2 && j === 2) {
+                break;
+              } 
+              else {
+              const td3 = tr3.insertCell();
+              if(j==0){// First column of the table : the one with the keys
+                td3.appendChild(document.createTextNode(key[i]));
+                td3.className="key-cell";
+              }
+              else{// Second column of the table : the one with the values of the metadata
+                td3.className="val-cell"
+                if(key[i]===accessString){ // consider separately the case where key is the apikey or access token 
+                  //create an input and a button with onclick function
+                  var keyInput = document.createElement("input");
+                  keyInput.type="text";
+                  keyInput.value="Enter your APIkey please";
+                  keyInput.className='key-container';
+                  td3.append(keyInput);  
+                  var validationButton = document.createElement("button");
+                  validationButton.className="button-container";
+                  td3.append(validationButton); 
+                  validationButton.innerHTML = "validate";
+                  validationButton.onclick=get_Code;
+                  function get_Code(){
+                    val[i]=keyInput.value;
+                    data[accessString]=keyInput.value;
+                    L.tileLayer(data["url"],data).addTo(parisMap);
+                  }
+                }
+                else{
+                  td3.appendChild(document.createTextNode(val[i]));
+                }
+              }
+            }
+          } 
+        }  
+      body.appendChild(tbl3);
       }
     }
-   }
-  
-body.appendChild(tbl);
+  catch{
+  }
 }
-
 
 function initMapTitle(data){
   var TitleDiv = document.createElement("div");
@@ -97,61 +148,7 @@ function initMapTitle(data){
 	var TitleContent = document.createTextNode(data["name"]);
 	TitleDiv.appendChild(TitleContent);
 	document.body.append(TitleDiv);  
-}
 
-
-function initMap(data,accessData){ 
-  basemap=getBaseMapName(data);
-  var MapContainer = document.createElement("div"); 
-  MapContainer.className = "map-container";
-	MapContainer.style.height="20%";                 
-	MapContainer.style.width="80%";
-	document.body.append(MapContainer);   
-  
-	  try{
-			//var marker = L.marker([48.81646, 2.46912]).addTo(parisMap);
-			//var marker = L.marker([48.81646, 2.46912], { opacity: 0.01 });
-			//marker.bindTooltip("Office is here", {permanent: true, className: "my-label", offset: [0, 0] });
-			//marker.addTo(parisMap);
-		//console.log("url is :",data["url"])
-    var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([48.81646, 2.46912], 11); 
-      if (accessData[basemap]===undefined){
-		    console.log("There is no access code needed for",basemap);
-        L.tileLayer(data["url"],data).addTo(parisMap);
-      }
-	    else{
-        dict=accessData[basemap];
-        var accessString=dict["accessString"];
-        var keyInput = document.createElement("input");
-        document.body.append(keyInput);  
-        keyInput.type="text";
-        keyInput.style.fontFamily="Arial";
-        keyInput.style.fontSize="20px";
-        keyInput.style.color="rgb(78, 116, 90)";
-        keyInput.class="key-container";
-        keyInput.value="Enter your APIkey please";
-        var validationButton = document.createElement("button");
-        document.body.append(validationButton); 
-        validationButton.class="button-container";
-        validationButton.style.fontFamily="Arial";
-        validationButton.style.fontWeight="bold";
-        validationButton.style.fontSize="20px";
-        validationButton.style.color="white";
-        validationButton.style.backgroundColor="rgb(78, 116, 90)";
-        validationButton.innerHTML = "validate";
-        validationButton.onclick=get_Code;
-        function get_Code(){
-          data[accessString]=keyInput.value;
-          console.log("the apikey is:",data[accessString]);
-          L.tileLayer(data["url"],data).addTo(parisMap);
-        }
-        
-      }
-    }	
-		catch{
-	
-    }
-   
 }
 var accessData={
 "Thunderforest": {
@@ -165,21 +162,20 @@ var accessData={
 },
 
      "HERE": {
-    "accessString": "apiKey",
+    "accessString": "app_code",
+    "accessID":"app_id",
     "name": "HERE"
 } ,  
-
         
 "HEREv3":{
-    "accessString": "apiKey",
-    "name": "HEREv3"
-   
-}      ,
+    "accessString": "app_code",
+    "accessID":"app_id",
+    "name": "HEREv3"   
+  },
 "MapTiler": {
 "accessString": "key",
 "name": "MapTiler"
-}  
-,
+  },
 "MapBox": {
 "accessString": "accessToken",
 "name": "MapBox"
@@ -187,13 +183,12 @@ var accessData={
 "Jawg":{
 "accessString":"accessToken",
 "name": "Jawg"
-},
+  },
 "TomTom":{
 "accessString": "apikey",
 "name": "TomTom"
+  }
 }
-}
-
 
 var data1 ={
   "OpenStreetMap": {
@@ -203,91 +198,9 @@ var data1 ={
             "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
             "attribution": "(C) OpenStreetMap contributors",
             "name": "OpenStreetMap.Mapnik"
-        },
-        "DE": {
-            "url": "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png",
-            "max_zoom": 18,
-            "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "attribution": "(C) OpenStreetMap contributors",
-            "name": "OpenStreetMap.DE"
-        },
-        "CH": {
-            "url": "https://tile.osm.ch/switzerland/{z}/{x}/{y}.png",
-            "max_zoom": 18,
-            "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "attribution": "(C) OpenStreetMap contributors",
-            "bounds": [
-                [
-                    45,
-                    5
-                ],
-                [
-                    48,
-                    11
-                ]
-            ],
-            "name": "OpenStreetMap.CH"
-        }
-      }, 
-"MapTiler": {
-        "Streets": {
-            "url": "https://api.maptiler.com/maps/{variant}/{z}/{x}/{y}{r}.{ext}?key={key}",
-            "html_attribution": "<a href=\"https://www.maptiler.com/copyright/\" target=\"_blank\">&copy; MapTiler</a> <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">&copy; OpenStreetMap contributors</a>",
-            "attribution": "(C) MapTiler (C) OpenStreetMap contributors",
-            "variant": "streets",
-            "ext": "png",
-            "key": "<insert your MapTiler Cloud API key here>",
-            "tileSize": 512,
-            "zoomOffset": -1,
-            "min_zoom": 0,
-            "max_zoom": 21,
-            "name": "MapTiler.Streets"
         }
       },
-  "Jawg": {
-        "Streets": {
-            "url": "https://{s}.tile.jawg.io/{variant}/{z}/{x}/{y}{r}.png?access-token={accessToken}",
-            "html_attribution": "<a href=\"http://jawg.io\" title=\"Tiles Courtesy of Jawg Maps\" target=\"_blank\">&copy; <b>Jawg</b>Maps</a> &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "attribution": "(C) **Jawg** Maps (C) OpenStreetMap contributors",
-            "min_zoom": 0,
-            "max_zoom": 22,
-            "subdomains": "abcd",
-            "variant": "jawg-streets",
-            "accessToken": "<insert your access token here>",
-            "name": "Jawg.Streets"
-        }
-      }
-    }
-
-    var data2 ={
-  "Jawg": {
-        "Streets": {
-            "url": "https://{s}.tile.jawg.io/{variant}/{z}/{x}/{y}{r}.png?access-token={accessToken}",
-            "html_attribution": "<a href=\"http://jawg.io\" title=\"Tiles Courtesy of Jawg Maps\" target=\"_blank\">&copy; <b>Jawg</b>Maps</a> &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "attribution": "(C) **Jawg** Maps (C) OpenStreetMap contributors",
-            "min_zoom": 0,
-            "max_zoom": 22,
-            "subdomains": "abcd",
-            "variant": "jawg-streets",
-            "accessToken": "<insert your access token here>",
-            "name": "Jawg.Streets"
-        }
-      },
-      "TomTom": {
-        "Basic": {
-            "url": "https://{s}.api.tomtom.com/map/1/tile/{variant}/{style}/{z}/{x}/{y}.{ext}?key={apikey}",
-            "variant": "basic",
-            "max_zoom": 22,
-            "html_attribution": "<a href=\"https://tomtom.com\" target=\"_blank\">&copy;  1992 - 2022 TomTom.</a> ",
-            "attribution": "(C) 1992 - 2022 TomTom.",
-            "subdomains": "abcd",
-            "style": "main",
-            "ext": "png",
-            "apikey": "<insert your API key here>",
-            "name": "TomTom.Basic"
-        }
-    },
-    "Thunderforest": {
+  "Thunderforest": {
         "OpenCycleMap": {
             "url": "https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}",
             "html_attribution": "&copy; <a href=\"http://www.thunderforest.com/\">Thunderforest</a>, &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
@@ -297,34 +210,57 @@ var data1 ={
             "max_zoom": 22,
             "name": "Thunderforest.OpenCycleMap"
         }
-      }
+      },
+  "HERE": {
+        "normalDay": {
+            "url": "https://{s}.{base}.maps.api.here.com/maptile/2.1/{type}/{mapID}/{variant}/{z}/{x}/{y}/{size}/{format}?app_id={app_id}&app_code={app_code}&lg={language}",
+            "html_attribution": "Map &copy; 1987-2022 <a href=\"http://developer.here.com\">HERE</a>",
+            "attribution": "Map (C) 1987-2022 HERE",
+            "subdomains": "1234",
+            "mapID": "newest",
+            "app_id": "<insert your app_id here>",
+            "app_code": "<insert your app_code here>",
+            "base": "base",
+            "variant": "normal.day",
+            "max_zoom": 20,
+            "type": "maptile",
+            "language": "eng",
+            "format": "png8",
+            "size": "256",
+            "name": "HERE.normalDay"
+        }
+    }
   }
-var CreateMapDataList=function(data){
+
+    
+var createMapDataList=function(data){
   var outDataList=[]    
   //getJSON("https://raw.githubusercontent.com/geopandas/xyzservices/main/provider_sources/leaflet-providers-parsed.json", (err, data) => {
-  for([keyData, valData] of Object.entries(data)) { 
-	  if (valData["url"]===undefined){// check if url is a key of the json object, if not go one level deeper and define the val as the new object
-		  newdata=valData;
+  
+    for([keyData, valData] of Object.entries(data)) { 
+	    if (valData["url"]===undefined){// check if url is a key of the json object, if not go one level deeper and define the val as the new object
+		    newdata=valData;
 
-		  for([keyNewdata, valNewdata] of Object.entries(newdata)){
-			  if (valNewdata["bounds"]===undefined){
-			  }
-			  else{
-		  	valNewdata["bounds"]=undefined;		
-			  }			
-		  outDataList.push(valNewdata);	
-		  }
-	  }
+		    for([keyNewdata, valNewdata] of Object.entries(newdata)){
+			    if (valNewdata["bounds"]===undefined){
+			    }
+			    else{
+		  	  valNewdata["bounds"]=undefined;		
+			    }			
+		    outDataList.push(valNewdata);	
+		    }
+	    }
 		
-	  else{
+	    else{
   		  outDataList.push(valData);
-	  }
-  }
-//})
+	    }
+    }
+  //})
+
   return outDataList
 }
 
-dataList=CreateMapDataList(data=data2)
+var dataList=createMapDataList(data=data1)
 const section1 = document.createElement("section");
 section1.className = "top-page";
 document.body.append(section1); 
@@ -341,12 +277,13 @@ h1.appendChild(textNode1);
 document.body.append(h1);
 
 for (let ii = 0; ii < dataList.length; ii++){
+//for (let ii = 0; ii < 1; ii++){
   data=dataList[ii];
+  //console.log('data is :',data)
   const div2 = document.createElement("div");
   div2.className = "thumbnail";
   document.body.append(div2); 
   initMapTitle(data);
-  initTableMetadata(data);
   initMap(data,accessData);
 }
 
