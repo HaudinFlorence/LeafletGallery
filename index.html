@@ -18,11 +18,8 @@
 
 </head>
 <body>
-
-
 <script>
-// Function to get data from a .json file
-var getJSON = function(url, callback) {
+  var getJSON = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.responseType = "json";
@@ -33,26 +30,77 @@ var getJSON = function(url, callback) {
       } else {
         callback(status, xhr.response);
       }
-    };
+    }
     xhr.send();
-};
+}
 
-function getBaseMapName(data){
-  name=data["name"]
+  function getBaseMapName(data) {
+  name=data["name"];
   if (name.includes(".")){
    var basemap=name.split(".")[0];
   }
   else{
-    var basemap=name
+    var basemap=name;
   }
   return basemap
 }
 
-function initMap(data,accessData){
+var accessData={ // contains the keys for basemaps that need some identification data (apikey, access token or ID code)
+  "Thunderforest": {
+    "keyString":"apikey",
+    "idString":"",
+    "name": "Thunderforest"
+  },
+  "OpenWeatherMap": {
+    "keyString":"apiKey",
+    "idString":"",
+    "name": "OpenWeatherMap"
+  },
+  "HERE": {
+    "keyString": "app_code",
+    "idString":"app_id",
+    "name": "HERE"
+  },        
+  "HEREv3": {
+    "keyString": "app_code",
+    "idString":"app_id",
+    "name": "HEREv3"   
+  },
+  "MapTiler": {
+    "keyString": "key",
+    "idString":"",
+  "name": "MapTiler"
+  },
+  "MapBox": {
+    "keyString": "accessToken",
+    "idString":"",
+    "name": "MapBox"
+  },
+  "Jawg": {
+    "keyString":"accessToken",
+    "idString":"",
+    "name": "Jawg"
+  },
+  "TomTom": {
+    "keyString": "apikey",
+    "idString":"",
+    "name": "TomTom"
+  }
+}
+
+function initMapTitle(data) {
+  var TitleDiv = document.createElement("div");
+  TitleDiv.className = "title-container";
+	var TitleContent = document.createTextNode(data["name"]);
+	TitleDiv.appendChild(TitleContent);
+	document.body.append(TitleDiv);  
+}
+
+function initMap(data,accessData) {
   basemap=getBaseMapName(data);
   var MapContainer = document.createElement("div"); 
-  MapContainer.style.width="80%"
-  MapContainer.style.height="30%"
+  MapContainer.style.width="60%"
+  MapContainer.style.height="20%"
   MapContainer.className = "map-container";
 	document.body.append(MapContainer);   
   key=Object.keys(data);
@@ -60,8 +108,9 @@ function initMap(data,accessData){
   nbOfRows=Object.keys(data).length;
   const body = document.body;
 
- try{
-    var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([48.81646, 2.46912], 11); 
+ try {
+    //var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([48.81646, 2.46912], 4); 
+    var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([50.1109, 8.6821], 12); 
     	//var marker = L.marker([48.81646, 2.46912]).addTo(parisMap);;
       //---------------------------------------------------------------------------------------------------------------------
       if (accessData[basemap]===undefined){ // No apikey or access token needed
@@ -81,7 +130,7 @@ function initMap(data,accessData){
                td1.appendChild(document.createTextNode(key[i]));
                td1.className="key-cell";
               }
-            else{// Second column of the table : the one with the values of the metadata
+            else {// Second column of the table : the one with the values of the metadata
               td1.className="val-cell"
               td1.appendChild(document.createTextNode(val[i]));
             }
@@ -91,201 +140,139 @@ function initMap(data,accessData){
       body.appendChild(tbl1);
     }
     //---------------------------------------------------------------------------------------------------------------------
-	    else{ // You need to give an apikey or an access token to display the map
+	    else{ // You need to give an apikey or an access token and possibibly an ID code to display the map
         dict=accessData[basemap];
-        var accessString=dict["accessString"]; 
-        tbl3 = document.createElement("table");
-        tbl3.className = "table-container";
+        var keyString=dict["keyString"]; 
+        var idString=dict["idString"]
+        tbl2 = document.createElement("table");
+        tbl2.className = "table-container";
         for (let i = 0; i < nbOfRows; i++) {
-            const tr3 = tbl3.insertRow();
+            const tr2 = tbl2.insertRow();
             for (let j = 0; j < 2; j++) {
               if (i === nbOfRows-2 && j === 2) {
                 break;
               } 
               else {
-              const td3 = tr3.insertCell();
+              const td2 = tr2.insertCell();
               if(j==0){// First column of the table : the one with the keys
-                td3.appendChild(document.createTextNode(key[i]));
-                td3.className="key-cell";
+                td2.appendChild(document.createTextNode(key[i]));
+                td2.className="key-cell";
               }
-              else{// Second column of the table : the one with the values of the metadata
-                td3.className="val-cell"
-                if(key[i]===accessString){ // consider separately the case where key is the apikey or access token 
+              else {// Second column of the table : the one with the values of the metadata
+                td2.className="val-cell"
+                //*******************************************************************************
+                //*******************************************************************************
+                //*******************************************************************************
+                if(key[i]===keyString&& key[i-1]!==idString) { // consider separately HERE and HERE.v3 with an app_id code and and app_code 
                   //create an input and a button with onclick function
                   var keyInput = document.createElement("input");
                   keyInput.type="text";
                   keyInput.value="Enter your APIkey please";
                   keyInput.className='key-container';
-                  td3.append(keyInput);  
+                  td2.append(keyInput);  
                   var validationButton = document.createElement("button");
                   validationButton.className="button-container";
-                  td3.append(validationButton); 
+                  td2.append(validationButton); 
                   validationButton.innerHTML = "validate";
-                  validationButton.onclick=get_Code;
-                  function get_Code(){
+                  validationButton.onclick=get_keyCode;
+                  function get_keyCode() {
                     val[i]=keyInput.value;
-                    data[accessString]=keyInput.value;
+                    data[keyString]=keyInput.value;
                     L.tileLayer(data["url"],data).addTo(parisMap);
                   }
                 }
+
+              else if(key[i]===idString && key[i+1]===keyString) { // consider separately the case where key is the apikey or access token 
+                //create an input and a button with onclick function
+                  var idInput = document.createElement("input");
+                  idInput.type="text";
+                  idInput.value="Enter your IDkey please";
+                  idInput.className='key-container';
+                  td2.append(idInput);  
+                  var validationButton = document.createElement("button");
+                  validationButton.className="button-container";
+                  td2.append(validationButton); 
+                  validationButton.innerHTML = "validate";
+                  validationButton.onclick=get_bothCodes;
+                  function get_bothCodes() {
+                      val[i]=idInput.value;
+                      data[idString]=idInput.value;
+                      var keyInput = document.createElement("input");
+                      keyInput.type="text";
+                      keyInput.value="Enter your APIkey please";
+                      keyInput.className='key-container';
+                      td2.append(keyInput);  
+                      var validationButton = document.createElement("button");
+                      validationButton.className="button-container";
+                      td2.append(validationButton); 
+                      validationButton.innerHTML = "validate";
+                      validationButton.onclick=get_keyCode;
+                      function get_keyCode() {
+                        val[i+1]=keyInput.value;
+                        data[keyString]=keyInput.value;
+                        L.tileLayer(data["url"],data).addTo(parisMap);
+                      }
+                    }
+                  }
+               
+
                 else{
-                  td3.appendChild(document.createTextNode(val[i]));
+                  td2.appendChild(document.createTextNode(val[i]));
                 }
               }
             }
           } 
         }  
-      body.appendChild(tbl3);
+      body.appendChild(tbl2);
       }
     }
-  catch{
+  catch {
   }
 }
 
-function initMapTitle(data){
-  var TitleDiv = document.createElement("div");
-  TitleDiv.className = "title-container";
-	var TitleContent = document.createTextNode(data["name"]);
-	TitleDiv.appendChild(TitleContent);
-	document.body.append(TitleDiv);  
+getJSON("https://raw.githubusercontent.com/geopandas/xyzservices/main/provider_sources/leaflet-providers-parsed.json", (err, data) => {
+    var dataList=[]   
+      for([key,val] of Object.entries(data)) { 
+	      if (val["url"]===undefined){// check if url is a key of the json object, if not go one level deeper and define the val as the new object
+		      newData=val; // need 
 
-}
-var accessData={
-"Thunderforest": {
-    "accessString":"apikey",
-    "name": "Thunderforest"
-
-},
-"OpenWeatherMap": {
-    "accessString":"apiKey",
-    "name": "OpenWeatherMap"
-},
-
-     "HERE": {
-    "accessString": "app_code",
-    "accessID":"app_id",
-    "name": "HERE"
-} ,  
-        
-"HEREv3":{
-    "accessString": "app_code",
-    "accessID":"app_id",
-    "name": "HEREv3"   
-  },
-"MapTiler": {
-"accessString": "key",
-"name": "MapTiler"
-  },
-"MapBox": {
-"accessString": "accessToken",
-"name": "MapBox"
-},
-"Jawg":{
-"accessString":"accessToken",
-"name": "Jawg"
-  },
-"TomTom":{
-"accessString": "apikey",
-"name": "TomTom"
-  }
-}
-
-var data1 ={
-  "OpenStreetMap": {
-        "Mapnik": {
-            "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            "max_zoom": 19,
-            "html_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "attribution": "(C) OpenStreetMap contributors",
-            "name": "OpenStreetMap.Mapnik"
-        }
-      },
-  "Thunderforest": {
-        "OpenCycleMap": {
-            "url": "https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}",
-            "html_attribution": "&copy; <a href=\"http://www.thunderforest.com/\">Thunderforest</a>, &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "attribution": "(C) Thunderforest, (C) OpenStreetMap contributors",
-            "variant": "cycle",
-            "apikey": "<insert your api key here>",
-            "max_zoom": 22,
-            "name": "Thunderforest.OpenCycleMap"
-        }
-      },
-  "HERE": {
-        "normalDay": {
-            "url": "https://{s}.{base}.maps.api.here.com/maptile/2.1/{type}/{mapID}/{variant}/{z}/{x}/{y}/{size}/{format}?app_id={app_id}&app_code={app_code}&lg={language}",
-            "html_attribution": "Map &copy; 1987-2022 <a href=\"http://developer.here.com\">HERE</a>",
-            "attribution": "Map (C) 1987-2022 HERE",
-            "subdomains": "1234",
-            "mapID": "newest",
-            "app_id": "<insert your app_id here>",
-            "app_code": "<insert your app_code here>",
-            "base": "base",
-            "variant": "normal.day",
-            "max_zoom": 20,
-            "type": "maptile",
-            "language": "eng",
-            "format": "png8",
-            "size": "256",
-            "name": "HERE.normalDay"
-        }
-    }
-  }
-
-    
-var createMapDataList=function(data){
-  var outDataList=[]    
-  //getJSON("https://raw.githubusercontent.com/geopandas/xyzservices/main/provider_sources/leaflet-providers-parsed.json", (err, data) => {
-  
-    for([keyData, valData] of Object.entries(data)) { 
-	    if (valData["url"]===undefined){// check if url is a key of the json object, if not go one level deeper and define the val as the new object
-		    newdata=valData;
-
-		    for([keyNewdata, valNewdata] of Object.entries(newdata)){
-			    if (valNewdata["bounds"]===undefined){
-			    }
-			    else{
-		  	  valNewdata["bounds"]=undefined;		
-			    }			
-		    outDataList.push(valNewdata);	
-		    }
-	    }
+		      for([newKey,newVal] of Object.entries(newData)) {
+			      if (newVal["bounds"]!==undefined){
+              newVal["bounds"]=undefined;		
+            }
+		      dataList.push(newVal);	
+		      }
+	      }
 		
-	    else{
-  		  outDataList.push(valData);
-	    }
-    }
-  //})
+	      else{
+  		    dataList.push(val);
+	      }
+      }
+      const section1 = document.createElement("section");
+      section1.className = "top-page";
+      document.body.append(section1); 
+      const header=document.createElement("header")
+      header.className = "header";
+      document.body.append(header); 
+      const div1=document.createElement("div")
+      div1.className = "landing-page";
+      document.body.append(div1); 
+      const h1 = document.createElement("h1");
+      h1.className = "big-title";
+      const textNode1 = document.createTextNode("Welcome to Leaflet's catalog");
+      h1.appendChild(textNode1);
+      document.body.append(h1);
 
-  return outDataList
-}
-
-var dataList=createMapDataList(data=data1)
-const section1 = document.createElement("section");
-section1.className = "top-page";
-document.body.append(section1); 
-const header=document.createElement("header")
-header.className = "header";
-document.body.append(header); 
-const div1=document.createElement("div")
-div1.className = "landing-page";
-document.body.append(div1); 
-const h1 = document.createElement("h1");
-h1.className = "big-title";
-const textNode1 = document.createTextNode("Welcome to Leaflet's catalog");
-h1.appendChild(textNode1);
-document.body.append(h1);
-
-for (let ii = 0; ii < dataList.length; ii++){
-//for (let ii = 0; ii < 1; ii++){
-  data=dataList[ii];
-  //console.log('data is :',data)
-  const div2 = document.createElement("div");
-  div2.className = "thumbnail";
-  document.body.append(div2); 
-  initMapTitle(data);
-  initMap(data,accessData);
-}
+      for (let ii = 1; ii < dataList.length-2; ii++){
+          data=dataList[ii];
+          const div2 = document.createElement("div");
+          div2.className = "thumbnail";
+          
+          initMapTitle(data);
+          initMap(data,accessData);
+          document.body.append(div2); 
+        }
+  })
 
 </script>
 </body>
