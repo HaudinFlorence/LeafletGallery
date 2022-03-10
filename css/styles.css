@@ -23,7 +23,7 @@ body {
     color:rgb(78, 116, 90);
     top: -20px;
     font-size:  45px;
-    font-family: 'Arial', cursive;
+    font-family: 'Arial';
     width: 100%;
     padding: '25px'
     /*background-color: green*/
@@ -33,7 +33,7 @@ body {
 {
  
     font-size:  20px;
-    font-family: 'Arial', cursive;
+    font-family: 'Arial';
     margin-left:auto;
     margin-right:auto;
     width: 50%;
@@ -56,72 +56,78 @@ section.top-page {
     /*background-color: red*/
 
 }
-
-
 .thumbnail{
     position:relative;
     margin-left: auto;
     margin-right: auto ;
-    margin-top: 50px;
-    margin-bottom: 10px;
-   border: 2px;
+    margin-top: 10px;
+    /*margin-bottom: 100px;*/
+   border: 1px;
    border-style: solid ;
-   width: 100%;
-   /*box-shadow: 10px 10px 10px rgb(78, 116, 90);*/
+   width: 70%;
+   box-shadow: 2px 2px 2px rgb(178, 178, 178);
 }
 
 .title-container{
     /*border: 5px solid rgb(141, 23, 121);  */
     /*border: 30 pix solid green;  */
     font-size:  30px;
-    font-family: 'Calibri', cursive;
+    font-family: 'Arial';
     margin-left: auto;
-    margin-right: auto;
+    margin-left: auto;
     color:rgb(78, 116, 90);
     /*font-weight:bold;*/
     text-decoration: underline;
     /*background-color:rgb(78, 116, 90)*/
 }
 
-
 .table-container{
     font-size:  18px;
-    font-family: 'Calibri', cursive;
-    width:60%;
-    border: 1px;
+    font-family: 'Arial';
+    width:80%;
     margin-left: auto;
     margin-right: auto ;
+    margin-top: 30px;
+    margin-bottom: 30px;
     background-color:white;
     /*border: 2px solid black;*/
 }
 .map-container{
     /*border: 2px solid black;*/
-    /*width:140%;
-    height:80%;*/
+    width:600px;
+    height:100px;
     margin-left: auto;
     margin-right: auto ;
     margin-top: 20px;
     margin-bottom: 20px;
-    padding: 20px;
+    padding: 40px;
     box-shadow: 2px 2px 2px rgb(178, 178, 178);
 
 }
 .key-container{
     font-size:  16px;
-    font-family: 'Sans-Serif', cursive;
+    font-family: 'Arial';
 }
 .button-container{
     font-size:  16px;
-    font-family: 'Calibri', cursive;
+    font-family: 'Arial';
     color: white;
     background-color:rgb(78, 116, 90);
 }
 .key-cell{
-    font-size:  22px;
-    font-family: 'Calibri', cursive;
+    font-size:  18px;
+    font-family: 'Arial';
+    line-height: 22px;
+    vertical-align: top;
+    width: 200px;
     color: rgb(119, 99, 99);
+    align-items: top;
 }
 .val-cell{
     font-size:  18px;
-    font-family: 'Monospace', cursive;
+    width: 200px;
+    margin-right: 50px;
+    line-height: 22px;
+    font-family: 'Monospace';
+    
 }

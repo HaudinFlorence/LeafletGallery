@@ -88,25 +88,26 @@ var accessData={ // contains the keys for basemaps that need some identification
   }
 }
 
-function initMapTitle(data) {
+
+
+function initMap(data,accessData) {
+  const div2 = document.createElement("div");
+  div2.className = "thumbnail";
+  document.body.append(div2);
+
   var TitleDiv = document.createElement("div");
   TitleDiv.className = "title-container";
 	var TitleContent = document.createTextNode(data["name"]);
 	TitleDiv.appendChild(TitleContent);
-	document.body.append(TitleDiv);  
-}
-
-function initMap(data,accessData) {
+	div2.append(TitleDiv);  
   basemap=getBaseMapName(data);
   var MapContainer = document.createElement("div"); 
-  MapContainer.style.width="60%"
-  MapContainer.style.height="20%"
   MapContainer.className = "map-container";
-	document.body.append(MapContainer);   
+	div2.append(MapContainer);   
   key=Object.keys(data);
   val=Object.values(data);
   nbOfRows=Object.keys(data).length;
-  const body = document.body;
+  
 
  try {
     //var parisMap = L.map(MapContainer, {attributionControl: true} ).setView([48.81646, 2.46912], 4); 
@@ -120,6 +121,7 @@ function initMap(data,accessData) {
 
         for (let i = 0; i < nbOfRows; i++) {
           const tr1 = tbl1.insertRow();
+          tr1.className="line-container"
           for (let j = 0; j < 2; j++) {
             if (i === nbOfRows-2 && j === 2) {
               break;
@@ -137,7 +139,8 @@ function initMap(data,accessData) {
           }
         }
       }
-      body.appendChild(tbl1);
+      //body.appendChild(tbl1);
+      div2.appendChild(tbl1);
     }
     //---------------------------------------------------------------------------------------------------------------------
 	    else{ // You need to give an apikey or an access token and possibibly an ID code to display the map
@@ -148,6 +151,7 @@ function initMap(data,accessData) {
         tbl2.className = "table-container";
         for (let i = 0; i < nbOfRows; i++) {
             const tr2 = tbl2.insertRow();
+            tr2.className="line-container"
             for (let j = 0; j < 2; j++) {
               if (i === nbOfRows-2 && j === 2) {
                 break;
@@ -223,7 +227,7 @@ function initMap(data,accessData) {
             }
           } 
         }  
-      body.appendChild(tbl2);
+      div2.appendChild(tbl2);
       }
     }
   catch {
@@ -264,13 +268,14 @@ getJSON("https://raw.githubusercontent.com/geopandas/xyzservices/main/provider_s
       document.body.append(h1);
 
       for (let ii = 1; ii < dataList.length-2; ii++){
+        console.log("Map n°:",ii)
           data=dataList[ii];
-          const div2 = document.createElement("div");
-          div2.className = "thumbnail";
-          
-          initMapTitle(data);
+          //const div2 = document.createElement("div");
+          //div2.className = "thumbnail";
+          //document.body.append(div2); 
+          //initMapTitle(data);
           initMap(data,accessData);
-          document.body.append(div2); 
+          
         }
   })
 
