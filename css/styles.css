@@ -17,7 +17,7 @@ body {
 /* tete de page */
 
 
-.big-title {
+.page-title {
     position: absolute;
     text-align: center;
     color:rgb(78, 116, 90);
@@ -45,8 +45,8 @@ body {
 
 }   
 
-section.top-page {
-    
+.top-page {
+    position:relative;
     /*justify-content: space-between;*/
     /*background: url('../images/map2.png');*/
     background-size: cover;
@@ -56,22 +56,24 @@ section.top-page {
     /*background-color: red*/
 
 }
-.thumbnail{
+.main-container{
     position:relative;
     margin-left: auto;
     margin-right: auto ;
-    margin-top: 10px;
-    /*margin-bottom: 100px;*/
-   border: 1px;
-   border-style: solid ;
-   width: 70%;
-   box-shadow: 2px 2px 2px rgb(178, 178, 178);
+    margin-top: 50px;
+    margin-bottom: 10px;
+    border: 1px;
+    border-style: solid;
+    border-color: rgb(220, 220, 220);
+    width: 95%;
+    box-shadow: 2px 2px 2px rgb(220, 220, 220);
 }
 
 .title-container{
-    /*border: 5px solid rgb(141, 23, 121);  */
+    /*border: 5px solid rg
+    b(141, 23, 121);  */
     /*border: 30 pix solid green;  */
-    font-size:  30px;
+    font-size:  25px;
     font-family: 'Arial';
     margin-left: auto;
     margin-left: auto;
@@ -81,10 +83,22 @@ section.top-page {
     /*background-color:rgb(78, 116, 90)*/
 }
 
+.introduction{
+    /*border: 5px solid rgb(141, 23, 121);  */
+    /*border: 30 pix solid green;  */
+    font-size:  18px;
+    font-family: 'Arial';
+    margin-top:10px;
+    margin-bottom:150px;
+    padding:50px;
+    margin-left: auto;
+    margin-left: auto;
+}
+
 .table-container{
     font-size:  18px;
     font-family: 'Arial';
-    width:80%;
+    width:60%;
     margin-left: auto;
     margin-right: auto ;
     margin-top: 30px;
@@ -92,10 +106,12 @@ section.top-page {
     background-color:white;
     /*border: 2px solid black;*/
 }
+
+
 .map-container{
     /*border: 2px solid black;*/
-    width:600px;
-    height:100px;
+    width:800px;
+    height:250px;
     margin-left: auto;
     margin-right: auto ;
     margin-top: 20px;
@@ -115,7 +131,7 @@ section.top-page {
     background-color:rgb(78, 116, 90);
 }
 .key-cell{
-    font-size:  18px;
+    font-size:  16px;
     font-family: 'Arial';
     line-height: 22px;
     vertical-align: top;
@@ -124,7 +140,7 @@ section.top-page {
     align-items: top;
 }
 .val-cell{
-    font-size:  18px;
+    font-size:  16px;
     width: 200px;
     margin-right: 50px;
     line-height: 22px;
