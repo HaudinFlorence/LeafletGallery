@@ -1,4 +1,5 @@
 
+
 @import url(https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap);
 @import url(https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap);
 
@@ -14,50 +15,19 @@ body {
     margin: 0 auto;
 }
 
-/* tete de page */
-
-
-.page-title {
-    position: absolute;
-    text-align: center;
-    color:rgb(78, 116, 90);
-    top: -20px;
-    font-size:  45px;
+.title-container {
+    font-size:  28px;
     font-family: 'Arial';
-    width: 100%;
-    padding: '25px'
-    /*background-color: green*/
-
-}
-.title-container
-{
- 
-    font-size:  20px;
-    font-family: 'Arial';
-    margin-left:auto;
-    margin-right:auto;
+    margin-right: auto;
     width: 50%;
-    padding: '25px';
+    padding: '20px';
     margin-top: 20px;
     margin-bottom: 10px;
-    color:rgb(78, 116, 90);
-    /*background-color: green*/
-
-}   
-
-.top-page {
-    position:relative;
-    /*justify-content: space-between;*/
-    /*background: url('../images/map2.png');*/
-    background-size: cover;
-    height: 3%;
-    width: 100%;
-    padding: 20px;
-    /*background-color: red*/
-
+    color: rgb(53, 111, 220);
 }
-.main-container{
-    position:relative;
+
+.main-container {
+    position: relative;
     margin-left: auto;
     margin-right: auto ;
     margin-top: 50px;
@@ -69,68 +39,45 @@ body {
     box-shadow: 2px 2px 2px rgb(220, 220, 220);
 }
 
-.title-container{
-    /*border: 5px solid rg
-    b(141, 23, 121);  */
-    /*border: 30 pix solid green;  */
-    font-size:  25px;
+.title-container {
+    font-size:  18px;
     font-family: 'Arial';
-    margin-left: auto;
-    margin-left: auto;
-    color:rgb(78, 116, 90);
-    /*font-weight:bold;*/
+    color: rgb(53, 111, 220);
     text-decoration: underline;
-    /*background-color:rgb(78, 116, 90)*/
 }
 
-.introduction{
-    /*border: 5px solid rgb(141, 23, 121);  */
-    /*border: 30 pix solid green;  */
-    font-size:  18px;
+.table-container {
+    font-size: 18px;
     font-family: 'Arial';
-    margin-top:10px;
-    margin-bottom:150px;
-    padding:50px;
-    margin-left: auto;
-    margin-left: auto;
-}
-
-.table-container{
-    font-size:  18px;
-    font-family: 'Arial';
-    width:60%;
+    width: 60%;
     margin-left: auto;
     margin-right: auto ;
     margin-top: 30px;
     margin-bottom: 30px;
-    background-color:white;
-    /*border: 2px solid black;*/
+    background-color: white;
 }
 
-
-.map-container{
-    /*border: 2px solid black;*/
-    width:800px;
-    height:250px;
+.map-container {
+    width: 800px;
+    height: 250px;
     margin-left: auto;
     margin-right: auto ;
     margin-top: 20px;
     margin-bottom: 20px;
-    padding: 40px;
+    padding: 20px;
     box-shadow: 2px 2px 2px rgb(178, 178, 178);
-
 }
-.key-container{
+.key-container {
     font-size:  16px;
     font-family: 'Arial';
 }
-.button-container{
+.button-container {
     font-size:  16px;
     font-family: 'Arial';
     color: white;
-    background-color:rgb(78, 116, 90);
+    background-color: rgb(53, 111, 220);
 }
-.key-cell{
+.key-cell {
     font-size:  16px;
     font-family: 'Arial';
     line-height: 22px;
@@ -139,11 +86,11 @@ body {
     color: rgb(119, 99, 99);
     align-items: top;
 }
-.val-cell{
+.val-cell {
     font-size:  16px;
     width: 200px;
     margin-right: 50px;
     line-height: 22px;
     font-family: 'Monospace';
-    
+
 }
