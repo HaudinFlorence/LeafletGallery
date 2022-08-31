@@ -1,0 +1,129 @@
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery of GeoportailFrance's tile layers</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+
+</head>
+<body>
+<script>
+var getJSON = function (url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.responseType = "json";
+  xhr.onload = function () {
+    var status = xhr.status;
+    if (status === 200) {
+      callback(null, xhr.response);
+    } else {
+      callback(status, xhr.response);
+    }
+  };
+  xhr.send();
+};
+
+function getBaseMapName(data) {
+  var name = data["name"];
+  if (name.includes(".")) {
+    var basemap = name.split(".")[0];
+  } else {
+    var basemap = name;
+  }
+  return basemap;
+}
+
+
+function initMap(data) {
+  basemap = getBaseMapName(data);
+
+  const mainContainer = document.createElement("div");
+  mainContainer.className = "main-container";
+  document.body.append(mainContainer);
+
+  var titleDiv = document.createElement("div");
+  titleDiv.className = "title-container";
+  titleDiv.textContent = data["name"];
+  mainContainer.append(titleDiv);
+
+  var mapContainer = document.createElement("div");
+  mapContainer.className = "map-container";
+  mainContainer.append(mapContainer);
+
+  key = Object.keys(data);
+  val = Object.values(data);
+  nbOfRows = Object.keys(data).length;
+  let latitude = 46.749998;
+  let longitude = 1.85;
+  let zoom = 6
+
+  var sampleMap = L.map(mapContainer, { attributionControl: true }).setView(
+      [latitude, longitude],
+      zoom
+    );
+  L.tileLayer(data["url"], data).addTo(sampleMap);
+  tbl1 = document.createElement("table");
+  tbl1.className = "table-container";
+
+  for (let i = 0; i < nbOfRows; i++) {
+    const tr1 = tbl1.insertRow();
+    tr1.className = "line-container";
+    for (let j = 0; j < 2; j++) {
+      if (i === nbOfRows - 2 && j === 2) {
+        break;
+      } else {
+        const td1 = tr1.insertCell();
+        if (j == 0) {
+            // First column of the table : the one with the keys
+          td1.className = "key-cell";
+          td1.textContent = key[i];
+        } else {
+          // Second column of the table : the one with the values of the metadata
+          td1.className = "val-cell";
+          td1.textContent = val[i];
+        }
+      }
+    }
+  }
+  mainContainer.appendChild(tbl1);
+}
+
+getJSON(
+  "Geoportail_providers.json",
+  (err, data) => {
+    var dataList = [];
+    for ([key, val] of Object.entries(data)) {
+      if (val["url"] === undefined) {
+        // check if url is a key of the json object, if not go one level deeper and define the val as the new object
+        newData = val;
+
+        for ([newKey, newVal] of Object.entries(newData)) {
+          if (newVal["bounds"] !== undefined) {
+            newVal["bounds"] = undefined;
+          }
+          dataList.push(newVal);
+        }
+      } else {
+        dataList.push(val);
+      }
+    }
+    dataList.forEach((baseMapData) => {
+      initMap(baseMapData);
+    });
+  }
+);
+
+
+</script>
+</body>
+</html>
